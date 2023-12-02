@@ -37,6 +37,14 @@ def part_one(record)
   possible.sum {|g| g.id }
 end
 
+def part_two(record)
+  powers = record.map do |game|
+    game.revealed.values.inject(&:*)
+  end
+
+  powers.sum
+end
+
 record = parse_record STDIN.read
 
 case ARGV[0]
