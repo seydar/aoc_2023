@@ -2,14 +2,15 @@ import System.IO
 import System.Environment
 import Data.List
 import Control.Monad
+import Data.Maybe
 
 getMap :: IO [String]
 getMap = do
   inp <- getContents
   return $ lines inp
 
-partOne :: [String] -> Maybe Int --[[Maybe Char]]
-partOne = sum <$> sequence . map (ints . firstAndLast)
+partOne :: [String] -> Int
+partOne = fromMaybe 0 . fmap sum . traverse (ints . firstAndLast)
   where
     ints :: [Maybe Char] -> Maybe Int
     ints = liftM read . sequence
