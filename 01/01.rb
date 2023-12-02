@@ -24,14 +24,14 @@ WORDS = {"one"   => "1",
 def part_two(map)
   pairs = map.map do |str|
     # Find the first
-    positions  = WORDS.map {|word, _| [word, str.index(word)] }.filter {|w, p| p }
-    positions += ('0'..'9').map {|i| [i, str.index(i)] }.filter {|d, p| p }
-    first = positions.min_by {|w, p| p }
+    first = WORDS.map {|word, _| [word, str.index(word)] }
+                 .filter {|w, p| p }
+                 .min_by {|w, p| p }
 
     # using rindex to search from the back first
-    positions  = WORDS.map {|word, _| [word, str.rindex(word)] }.filter {|w, p| p }
-    positions += ('0'..'9').map {|i| [i, str.rindex(i)] }.filter {|d, p| p }
-    last  = positions.max_by {|w, p| p }
+    last = WORDS.map {|word, _| [word, str.rindex(word)] }
+                .filter {|w, p| p }
+                .max_by {|w, p| p }
 
     (WORDS[first[0]] + WORDS[last[0]]).to_i
   end
