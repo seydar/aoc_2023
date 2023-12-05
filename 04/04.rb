@@ -39,17 +39,14 @@ def part_one(cards)
 end
 
 def part_two(cards)
-  i = 0
-  until cards[i].nil?
-    cur = cards[i]
+  tally = cards.map {|c| [c, 1] }.to_h
 
-    extra = cards[cur.id, cur.matching.size]
-    cards += extra
-
-    i += 1
+  cards.each do |cur|
+    copies = cards[cur.id, cur.matching.size]
+    copies.each {|c| tally[c] += tally[cur] }
   end
 
-  cards.size
+  tally.values.sum
 end
 
 cards = parse_cards STDIN.read
