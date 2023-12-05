@@ -1,5 +1,19 @@
 #!/usr/bin/env ruby
 
+class Range
+
+  def overlap?(other)
+    include?(other.begin) || other.include?(self.begin)
+  end
+
+  def combine(other)
+    # if overlapping
+    if overlap?(other)
+      [self.begin, other.begin].min .. [self.end, other.end].max
+    end
+  end
+end
+
 class Map
   attr_accessor :name
   attr_accessor :maps
@@ -10,8 +24,13 @@ class Map
   end
 
   def [](val)
-    map = maps.find {|m| val >= m[1] && val <= (m[1] + m[2] - 1) }
+    map = maps.find {|m| val >= m[1] && val < (m[1] + m[2]) }
     map ? map[0] + (val - map[1]) : val
+  end
+
+  def rev(val)
+    map = maps.find {|m| val >= m[0] && val < (m[0] + m[2]) }
+    map ? map[1] + (val - map[0]) : val
   end
 end
 
@@ -30,11 +49,35 @@ def part_one(seeds, almanac)
   locations.min
 end
 
-def part_two(seeds, almanac)
-  seeds = seeds.each_slice(2).map {|l, h| (l..l + h).to_a }.flatten
+def collapse_ranges(ranges)
+  combined = []
+  (0..ranges.size - 1).each do |i|
+    added = false
 
-  p seeds.size
-  part_one seeds, almanac
+    (i + 1..ranges.size - 1).each do |j|
+      if ranges[i].overlap? ranges[j]
+        combined << ranges[i].combine(ranges[j])
+        added = true
+      end
+    end
+
+    combined << ranges[i] unless added
+  end
+
+  combined
+end
+
+# gotta work backwards
+def part_two(seeds, almanac)
+  seeds = seeds.each_slice(2).map {|l, h| (l .. l + h) }
+  
+  #seeds = collapse_ranges seeds
+
+  0.upto(seeds.map(&:end).max).map do |i|
+    p i if i % 1_000_000 == 0
+    origin = almanac.reverse.inject(i) {|val, map| map.rev val }
+    return [origin, i] if seeds.find {|r| r.include? origin }
+  end
 end
 
 almanac = parse_almanac STDIN.read
